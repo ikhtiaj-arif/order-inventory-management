@@ -1,14 +1,14 @@
-export enum Role {
+export enum UserRole {
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
-  GUEST = "GUEST",
+  USER = "USER",
 }
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: Role;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
 }

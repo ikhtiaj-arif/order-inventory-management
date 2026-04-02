@@ -13,12 +13,6 @@ datasource db {
 }
 
 
-enum UserRole {
-  ADMIN
-  MANAGER
-  USER
-}
-
 // User model for authentication
 model User {
   id        String     @id @default(cuid())
@@ -28,6 +22,17 @@ model User {
   role      UserRole   @default(USER)
   image     String?
  
+ // time stamps
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+
+  //indexing
+  @@index([email])
+  // @@index([role])
+
+  // map
+  @@map("users")
+
+
+
 }
