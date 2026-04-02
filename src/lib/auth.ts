@@ -1,4 +1,4 @@
-import { UserRole, User } from "@/types";
+import { User, UserRole } from "@/types";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
