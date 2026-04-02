@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#  Smart Inventory & Order Management System
 
-## Getting Started
+A modern full-stack web application to manage **inventory, products, customer orders, and fulfillment workflows** with real-time stock validation, conflict detection, and intelligent restocking.
 
-First, run the development server:
+Built with scalability and real-world business logic in mind, this system ensures **data consistency, transactional safety, and operational efficiency**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##  Live Demo
+- 🌐 Frontend: *(Add your deployed URL)*
+- 🔗 API: *(If applicable)*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+##  Features
 
-## Learn More
+###  Authentication
+- Email & Password based authentication  
+- Secure login & session handling  
+- Demo login for quick access  
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+###  Product & Category Management
+- Create and manage categories  
+- Add and manage products with:
+  - Name, category, price  
+  - Stock quantity  
+  - Minimum stock threshold  
+- Automatic product status:
+  - Active  
+  - Out of Stock  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+###  Order Management
+- Create, update, cancel orders  
+- Multi-product order support  
+- Auto-calculated pricing  
+- Order lifecycle:
+  - Pending → Confirmed → Shipped → Delivered / Cancelled  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+###  Smart Inventory Handling
+- Automatic stock deduction on order placement  
+- Prevent overselling with strict validation  
+- Real-time stock availability warnings  
+- Auto-update product status when stock reaches zero  
+
+---
+
+###  Restock Queue System
+- Auto-detect low stock items  
+- Priority-based restock queue:
+  - High / Medium / Low  
+- Manual restocking support  
+- Automatic removal after restock  
+
+---
+
+###  Conflict Detection
+- Prevent duplicate products in an order  
+- Block ordering inactive/unavailable products  
+- Clear validation messages for users  
+
+---
+
+###  Dashboard & Insights
+- Orders overview (daily stats)  
+- Revenue tracking  
+- Low stock alerts  
+- Product availability summary  
+
+---
+
+###  Activity Log
+- Tracks recent system activities:
+  - Order creation/updates  
+  - Stock updates  
+  - Restock events  
+  - Status changes  
+
+---
+
+###  Bonus Features
+- Search & filtering  
+- Pagination  
+- Basic analytics (charts)  
+- Role-based access (Admin / Manager)  
+
+---
+
+##  Tech Stack
+
+### Frontend
+- Next.js (App Router)  
+- TypeScript  
+- Tailwind CSS  
+- ShadCN UI  
+
+### Backend
+- Next.js API Routes / Server Actions  
+
+### Database
+- PostgreSQL  
+- Prisma ORM  
+
+### State Management
+- Redux Toolkit / RTK Query *(optional)*  
+
+### Deployment
+- Vercel (Frontend + Backend)  
+- Neon / Supabase (Database)  
+
+---
+
+##  System Design Highlights
+
+- **Transactional Integrity**
+  - Uses Prisma transactions for safe order creation and stock updates  
+
+- **Conflict Prevention**
+  - Backend validation to prevent invalid operations  
+
+- **Scalable Architecture**
+  - Service-based structure for business logic separation  
+
+- **Real-time Feedback**
+  - Immediate validation messages for better UX  
+
+---
