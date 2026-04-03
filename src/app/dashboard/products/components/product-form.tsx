@@ -1,19 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 const productFormSchema = z.object({
@@ -23,7 +17,7 @@ const productFormSchema = z.object({
   price: z.number().positive("Price must be positive"),
   stock: z.number().nonnegative("Stock cannot be negative"),
   categoryId: z.string().optional(),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 type ProductFormData = z.infer<typeof productFormSchema>;
@@ -37,16 +31,14 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<ProductFormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      isActive: true, // default value for boolean
+    },
   });
 
-  const onSubmit = async (data: ProductFormData) => {
+  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
     setSubmitError("");
     setIsSubmitting(true);
 
@@ -86,29 +78,15 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Product Name
-              </label>
-              <Input
-                {...register("name")}
-                placeholder="e.g., Laptop"
-                disabled={isSubmitting}
-              />
-              {errors.name && (
-                <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>
-              )}
+              <label className="block text-sm font-medium mb-1">Product Name</label>
+              <Input {...register("name")} placeholder="e.g., Laptop" disabled={isSubmitting} />
+              {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">SKU</label>
-              <Input
-                {...register("sku")}
-                placeholder="e.g., SKU-001"
-                disabled={isSubmitting}
-              />
-              {errors.sku && (
-                <p className="text-red-600 text-sm mt-1">{errors.sku.message}</p>
-              )}
+              <Input {...register("sku")} placeholder="e.g., SKU-001" disabled={isSubmitting} />
+              {errors.sku && <p className="text-red-600 text-sm mt-1">{errors.sku.message}</p>}
             </div>
 
             <div>
@@ -120,30 +98,22 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
                 placeholder="0.00"
                 disabled={isSubmitting}
               />
-              {errors.price && (
-                <p className="text-red-600 text-sm mt-1">{errors.price.message}</p>
-              )}
+              {errors.price && <p className="text-red-600 text-sm mt-1">{errors.price.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Initial Stock
-              </label>
+              <label className="block text-sm font-medium mb-1">Initial Stock</label>
               <Input
                 {...register("stock", { valueAsNumber: true })}
                 type="number"
                 placeholder="0"
                 disabled={isSubmitting}
               />
-              {errors.stock && (
-                <p className="text-red-600 text-sm mt-1">{errors.stock.message}</p>
-              )}
+              {errors.stock && <p className="text-red-600 text-sm mt-1">{errors.stock.message}</p>}
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-1">
-                Description
-              </label>
+              <label className="block text-sm font-medium mb-1">Description</label>
               <Input
                 {...register("description")}
                 placeholder="Product description (optional)"
@@ -153,20 +123,11 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="gap-2"
-            >
+            <Button type="submit" disabled={isSubmitting} className="gap-2">
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSubmitting ? "Creating..." : "Create Product"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
               Cancel
             </Button>
           </div>

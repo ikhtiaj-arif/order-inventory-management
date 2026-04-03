@@ -1,6 +1,7 @@
-import { getSession } from "@/lib/session";
+ 
 import { redirect } from "next/navigation";
 import ProductsClient from "./components/products-client";
+import { getSession } from "@/lib/sessions";
 
 export const metadata = {
   title: "Products | Smart Inventory Manager",

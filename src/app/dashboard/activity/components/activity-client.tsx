@@ -1,21 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { logout } from "@/app/actions/auth";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
-import { logout } from "@/app/actions/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 // interface ActivityLog {
 //   id: string;
@@ -32,7 +23,7 @@ import { logout } from "@/app/actions/auth";
 // }
 
 // export default function ActivityClient({ initialLogs }: ActivityClientProps) {
-export default function ActivityClient(initialLogs: any[]) {
+export default function ActivityClient() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -40,11 +31,11 @@ export default function ActivityClient(initialLogs: any[]) {
     await logout();
   };
 
-  const filteredLogs = initialLogs.filter((log: { action: string; details: string; user: { name: string; }; }) =>
-    log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredLogs = initialLogs.filter((log: { action: string; details: string; user: { name: string; }; }) =>
+  //   log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   log.user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   const getActionColor = (action: string) => {
     if (action.includes("CREATE")) return "bg-green-100 text-green-800";
@@ -86,7 +77,7 @@ export default function ActivityClient(initialLogs: any[]) {
                   />
                 </div>
 
-                {filteredLogs.length === 0 ? (
+                {/* {filteredLogs.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground">No activities found</p>
                   </div>
@@ -132,7 +123,7 @@ export default function ActivityClient(initialLogs: any[]) {
                       </TableBody>
                     </Table>
                   </div>
-                )}
+                )} */}
               </CardContent>
             </Card>
           </div>

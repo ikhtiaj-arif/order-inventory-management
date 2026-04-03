@@ -30,5 +30,6 @@ export default async function ActivityPage() {
     },
   });
 
-  return <ActivityClient initialLogs={logs} />;
+  // return <ActivityClient initialLogs={logs} />;
+  return <ActivityClient />;
 }

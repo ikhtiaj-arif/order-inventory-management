@@ -1,29 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  ShoppingCart,
-  AlertTriangle,
-  TrendingUp,
-  Package,
-  LogOut,
-} from "lucide-react";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertTriangle,
+  Package,
+  ShoppingCart,
+  TrendingUp
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface DashboardClientProps {
   user: any;
@@ -52,6 +51,7 @@ export default function DashboardClient({
   stats,
   activityLogs,
 }: DashboardClientProps) {
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
 

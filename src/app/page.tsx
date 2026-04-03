@@ -1,17 +1,17 @@
 
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSession } from "@/lib/sessions";
 import {
+  BarChart3,
+  CheckCircle,
+  Lock,
   Package,
   ShoppingCart,
-  BarChart3,
-  Lock,
   Zap,
-  CheckCircle,
 } from "lucide-react";
-import { getSession } from "@/lib/sessions";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Smart Inventory Manager - Home",
@@ -19,7 +19,10 @@ export const metadata = {
     "Intelligent inventory management system with order tracking and analytics",
 };
 
+console.log("hello world")
+
 export default async function HomePage() {
+
   const session = await getSession();
 
   // Redirect authenticated users to dashboard

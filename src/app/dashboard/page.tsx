@@ -1,13 +1,15 @@
-import { redirect } from "next/navigation";
-import { getSession } from "@/lib/sessions";
-import { prisma } from "@/lib/db";
-import DashboardClient from "./components/dashboard-client";
 import { OrderStatus, ProductStatus } from "@/generated/prisma";
+import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/sessions";
+import { redirect } from "next/navigation";
+import DashboardClient from "./components/dashboard-client";
 
 export const metadata = {
   title: "Dashboard | Smart Inventory Manager",
   description: "Manage your inventory and orders",
 };
+
+
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -58,7 +60,7 @@ export default async function DashboardPage() {
       }),
     ]);
 
-  // ✅ BEST PRACTICE: use totalPrice (no relation issues)
+  // BEST PRACTICE: use totalPrice (no relation issues)
   const orderData = await prisma.order.findMany({
     where: {
       status: {
@@ -74,6 +76,8 @@ export default async function DashboardPage() {
     return sum + Number(order.totalPrice);
   }, 0);
 
+
+
   return (
     <DashboardClient
       user={session.user}
@@ -83,7 +87,18 @@ export default async function DashboardPage() {
         lowStockProducts,
         totalRevenue,
       }}
-      activityLogs={activityLogs}
+      activityLogs={activityLogs.map((log) => ({
+        id: log.id,
+        action: log.action,
+        entityType: log.entityType,
+        entityId: log.entityId,
+        details: JSON.stringify(log.details),
+        // createdAt: log.createdAt.toISOString(),
+        user: {
+          name: log.user.name || "Unknown",
+          email: log.user.email,
+        },
+      }))}
     />
   );
 }
