@@ -1,10 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -44,17 +39,14 @@ enum EntityType {
   RESTOCK
 }
 
-// User model for authentication
+// ================= USER =================
 model User {
   id       String   @id @default(cuid())
   email    String   @unique
   name     String?
-  password String? // hashed password for email/password auth
+  password String?
   role     UserRole @default(USER)
   image    String?
-
-  //relations
-  // Relations
 
   sessions     Session[]
   categories   Category[]
@@ -63,29 +55,29 @@ model User {
   restockQueue RestockQueue[]
   activityLogs ActivityLog[]
 
-  // time stamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  // @@index([role])
 
-  //indexing
   @@index([email])
-  // map
   @@map("users")
 }
 
+// ================= SESSION =================
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ================= CATEGORY =================
 model Category {
-  id       String    @id @default(cuid())
-  name     String
-  userId   String
+  id     String @id @default(cuid())
+  name   String
+  userId String
+
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   products Product[]
 
@@ -95,31 +87,32 @@ model Category {
   @@unique([userId, name])
 }
 
+// ================= PRODUCT =================
 model Product {
   id                String        @id @default(cuid())
   name              String
   categoryId        String
-  category          Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   price             Decimal       @db.Decimal(10, 2)
   stock             Int           @default(0)
   minStockThreshold Int           @default(10)
   status            ProductStatus @default(ACTIVE)
   userId            String
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   orderItems   OrderItem[]
   restockQueue RestockQueue?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes for performance
   @@index([userId, status])
   @@index([categoryId])
   @@index([userId, name])
 }
 
+// ================= ORDER =================
 model Order {
   id           String      @id @default(cuid())
   orderNumber  String      @unique
@@ -127,28 +120,29 @@ model Order {
   totalPrice   Decimal     @db.Decimal(10, 2)
   status       OrderStatus @default(PENDING)
   userId       String
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes for performance
   @@index([userId, status])
   @@index([userId, createdAt])
 }
 
+// ================= ORDER ITEM =================
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+
   quantity  Int
   unitPrice Decimal @db.Decimal(10, 2)
   subtotal  Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -156,14 +150,16 @@ model OrderItem {
   @@index([productId])
 }
 
+// ================= RESTOCK =================
 model RestockQueue {
   id           String          @id @default(cuid())
   productId    String          @unique
-  product      Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   currentStock Int
   priority     RestockPriority @default(MEDIUM)
   userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,16 +168,20 @@ model RestockQueue {
   @@index([userId, currentStock])
 }
 
+// ================= ACTIVITY LOG =================
 model ActivityLog {
   id         String     @id @default(cuid())
   userId     String
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action     String //"ORDER_CREATED", "STOCK_UPDATED", "PRODUCT_ADDED"
+  action     String
   entityType EntityType
-  entityId   String //ID of the entity being acted upon
-  details    Json? //Additional data about the action
-  timestamp  DateTime   @default(now())
+  entityId   String
+  details    Json?
 
-  @@index([userId, timestamp(sort: Desc)])
+  
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
   @@index([entityType])
 }
