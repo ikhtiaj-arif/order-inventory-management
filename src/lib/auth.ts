@@ -1,57 +1,116 @@
-import { User, UserRole } from "@/types";
-import bcrypt from "bcryptjs";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { prisma } from "./db";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+/**
+ * Hash a password using bcryptjs
+ */
+export async function hashedPassword(password: string): Promise<string> {
+  const salt = await bcryptjs.genSalt(10);
+  return bcryptjs.hash(password, salt);
+}
 
-export const hashedPassword = async (password: string): Promise<string> => {
-  return bcrypt.hash(password, 12);
-};
-export const verifyPassword = async (
+/**
+ * Compare a password with its hash
+ */
+export async function verifyPassword(
   password: string,
-  hashedPassword: string,
-): Promise<boolean> => {
-  return bcrypt.compare(password, hashedPassword);
-};
+  hash: string,
+): Promise<boolean> {
+  return bcryptjs.compare(password, hash);
+}
 
-export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
-};
+/**
+ * Get user by email
+ */
+export async function getUserByEmail(email: string) {
+  return prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      image: true,
+    },
+  });
+}
 
-export const verifyToken = (token: string): { userId: string } => {
-  return jwt.verify(token, JWT_SECRET) as { userId: string };
-};
+/**
+ * Create a new user
+ */
+export async function createUser(
+  email: string,
+  name: string,
+  password: string,
+) {
+  const hashPassword = await hashedPassword(password);
 
-export const getCurrentUser = async (): Promise<User | null> => {
-  try {
-    const cookie = await cookies();
-    const token = cookie.get("token")?.value;
-    if (!token) return null;
+  return prisma.user.create({
+    data: {
+      email,
+      name,
+      password: hashPassword,
+      role: "USER",
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+    },
+  });
+}
 
-    const decode = verifyToken(token);
-    const userFromDB = await prisma.user.findUnique({
-      where: { id: decode.userId },
-    });
-    if (!userFromDB) return null;
+/**
+ * Verify user credentials
+ */
+export async function verifyUserCredentials(email: string, password: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-    const { password, ...user } = userFromDB;
-    return user as User;
-  } catch (error) {
-    console.error("Error: ", error);
+  if (!user || !user.password) {
     return null;
   }
-};
 
-export const checkUserPermission = (
-  user: User,
-  requiredRole: UserRole,
-): boolean => {
-  const roleHierarchy = {
-    [UserRole.USER]: 1,
-    [UserRole.MANAGER]: 2,
-    [UserRole.ADMIN]: 3,
+  const isValid = await verifyPassword(password, user.password);
+
+  if (!isValid) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
   };
-  return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
-};
+}
+
+/**
+ * Get user by ID
+ */
+export async function getUserById(userId: string) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      image: true,
+    },
+  });
+}
+
+/**
+ * Generate a JWT token for a given user ID
+ */
+export function generateToken(userId: string): string {
+  const secret = process.env.JWT_SECRET || "default_secret";
+  return jwt.sign({ userId }, secret, {
+    expiresIn: "7d",
+  });
+}
+

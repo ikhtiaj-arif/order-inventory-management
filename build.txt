@@ -1,0 +1,45 @@
+
+> smart-inventory-system@0.1.0 build
+> next build
+
+▲ Next.js 16.2.2 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.6s
+  Running TypeScript ...
+  Finished TypeScript in 3.1s ...
+  Collecting page data using 15 workers ...
+hello world
+  Generating static pages using 15 workers (0/19) ...
+  Generating static pages using 15 workers (4/19) 
+  Generating static pages using 15 workers (9/19) 
+  Generating static pages using 15 workers (14/19) 
+hello world
+✓ Generating static pages using 15 workers (19/19) in 329ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/auth/demo
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/register
+├ ƒ /api/health
+├ ƒ /api/orders
+├ ƒ /api/products
+├ ƒ /api/restock
+├ ƒ /api/user
+├ ƒ /api/user/[userId]
+├ ƒ /dashboard
+├ ƒ /dashboard/activity
+├ ƒ /dashboard/orders
+├ ƒ /dashboard/products
+├ ƒ /dashboard/restock
+└ ○ /login
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

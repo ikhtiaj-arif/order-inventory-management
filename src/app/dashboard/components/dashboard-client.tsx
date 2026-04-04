@@ -51,7 +51,6 @@ export default function DashboardClient({
   stats,
   activityLogs,
 }: DashboardClientProps) {
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
 

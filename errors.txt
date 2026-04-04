@@ -1,0 +1,4 @@
+src/app/dashboard/page.tsx(55,20): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]'.
+src/lib/activity-logger.ts(50,16): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]'.
+src/lib/activity-logger.ts(59,7): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ActivityLogSelect<DefaultArgs>'.
+src/lib/activity-logger.ts(77,16): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]'.

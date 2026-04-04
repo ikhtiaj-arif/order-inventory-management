@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -39,7 +38,6 @@ enum EntityType {
   RESTOCK
 }
 
-// ================= USER =================
 model User {
   id       String   @id @default(cuid())
   email    String   @unique
@@ -62,7 +60,6 @@ model User {
   @@map("users")
 }
 
-// ================= SESSION =================
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -72,7 +69,6 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// ================= CATEGORY =================
 model Category {
   id     String @id @default(cuid())
   name   String
@@ -87,7 +83,6 @@ model Category {
   @@unique([userId, name])
 }
 
-// ================= PRODUCT =================
 model Product {
   id                String        @id @default(cuid())
   name              String
@@ -112,7 +107,6 @@ model Product {
   @@index([userId, name])
 }
 
-// ================= ORDER =================
 model Order {
   id           String      @id @default(cuid())
   orderNumber  String      @unique
@@ -131,9 +125,8 @@ model Order {
   @@index([userId, createdAt])
 }
 
-// ================= ORDER ITEM =================
 model OrderItem {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   orderId   String
   productId String
 
@@ -150,7 +143,6 @@ model OrderItem {
   @@index([productId])
 }
 
-// ================= RESTOCK =================
 model RestockQueue {
   id           String          @id @default(cuid())
   productId    String          @unique
@@ -168,7 +160,6 @@ model RestockQueue {
   @@index([userId, currentStock])
 }
 
-// ================= ACTIVITY LOG =================
 model ActivityLog {
   id         String     @id @default(cuid())
   userId     String
@@ -177,7 +168,6 @@ model ActivityLog {
   entityId   String
   details    Json?
 
-  
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

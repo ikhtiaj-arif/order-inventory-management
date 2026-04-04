@@ -1,15 +1,13 @@
-import { OrderStatus, ProductStatus } from "@/generated/prisma";
-import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/sessions";
+
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
 import DashboardClient from "./components/dashboard-client";
+import { getSession } from "@/lib/sessions";
 
 export const metadata = {
   title: "Dashboard | Smart Inventory Manager",
   description: "Manage your inventory and orders",
 };
-
-
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -18,65 +16,46 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Start of today
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-
-  // Fetch dashboard data (SAFE Prisma usage)
-  const [todayOrders, pendingOrders, lowStockProducts, activityLogs] =
+  // Fetch dashboard data
+  const [todayOrders, pendingOrders, lowStockProducts, totalRevenue, activityLogs] =
     await Promise.all([
       prisma.order.count({
         where: {
+          userId: session.user.id,
           createdAt: {
-            gte: startOfToday,
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
           },
         },
       }),
-
-      // ✅ FIX: enum instead of string
       prisma.order.count({
         where: {
-          status: OrderStatus.PENDING,
+          userId: session.user.id,
+          status: "PENDING",
         },
       }),
-
-      //  FIX: use status instead of isActive
       prisma.product.count({
         where: {
+          userId: session.user.id,
           stock: { lt: 10 },
-          status: ProductStatus.ACTIVE,
+          status: "ACTIVE",
         },
       }),
-
-      //  FIX: avoid createdAt error (fallback to id sorting if needed)
+      prisma.order.aggregate({
+        where: {
+          userId: session.user.id,
+          status: { in: ["CONFIRMED", "SHIPPED", "DELIVERED"] },
+        },
+        _sum: {
+          totalPrice: true,
+        },
+      }),
       prisma.activityLog.findMany({
+        where: { userId: session.user.id },
         take: 10,
-        orderBy: {
-          id: "desc", //always safe (no schema mismatch risk)
-        },
-        include: {
-          user: true,
-        },
+        orderBy: { createdAt: "desc" },
+        include: { user: true },
       }),
     ]);
-
-  // BEST PRACTICE: use totalPrice (no relation issues)
-  const orderData = await prisma.order.findMany({
-    where: {
-      status: {
-        in: [OrderStatus.DELIVERED, OrderStatus.PENDING],
-      },
-    },
-    select: {
-      totalPrice: true,
-    },
-  });
-
-  const totalRevenue = orderData.reduce((sum, order) => {
-    return sum + Number(order.totalPrice);
-  }, 0);
-
-
 
   return (
     <DashboardClient
@@ -85,20 +64,9 @@ export default async function DashboardPage() {
         todayOrders,
         pendingOrders,
         lowStockProducts,
-        totalRevenue,
+        totalRevenue: Number(totalRevenue._sum.totalPrice || 0),
       }}
-      activityLogs={activityLogs.map((log) => ({
-        id: log.id,
-        action: log.action,
-        entityType: log.entityType,
-        entityId: log.entityId,
-        details: JSON.stringify(log.details),
-        // createdAt: log.createdAt.toISOString(),
-        user: {
-          name: log.user.name || "Unknown",
-          email: log.user.email,
-        },
-      }))}
+      activityLogs={activityLogs}
     />
   );
 }

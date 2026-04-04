@@ -1,0 +1,15 @@
+.next/dev/types/validator.ts(161,39): error TS2306: File 'D:/LEVEL_2/Projects/Order and Inventory management/smart-inventory-system/src/app/api/orders/route.ts' is not a module.
+.next/dev/types/validator.ts(179,39): error TS2306: File 'D:/LEVEL_2/Projects/Order and Inventory management/smart-inventory-system/src/app/api/restock/route.ts' is not a module.
+.next/dev/types/validator.ts(188,39): error TS2306: File 'D:/LEVEL_2/Projects/Order and Inventory management/smart-inventory-system/src/app/api/user/[userId]/route.ts' is not a module.
+.next/dev/types/validator.ts(197,39): error TS2306: File 'D:/LEVEL_2/Projects/Order and Inventory management/smart-inventory-system/src/app/api/user/route.ts' is not a module.
+src/app/api/auth/login/route.ts(2,10): error TS2305: Module '"@/lib/auth"' has no exported member 'generateToken'.
+src/app/api/auth/register/route.ts(2,10): error TS2305: Module '"@/lib/auth"' has no exported member 'generateToken'.
+src/app/api/health/route.ts(1,10): error TS2305: Module '"@/lib/db"' has no exported member 'checkDatabaseConnection'.
+src/app/api/products/route.ts(2,1): error TS2304: Cannot find name 's'.
+src/app/api/products/route.ts(49,27): error TS2304: Cannot find name 'auth'.
+src/app/api/products/route.ts(60,9): error TS2353: Object literal may only specify known properties, and 'createdBy' does not exist in type 'Without<ProductCreateInput, ProductUncheckedCreateInput> & ProductUncheckedCreateInput'.
+src/app/api/products/route.ts(68,7): error TS2820: Type '"Product"' is not assignable to type 'EntityType'. Did you mean '"PRODUCT"'?
+src/app/api/products/route.ts(70,7): error TS2322: Type 'string' is not assignable to type 'Record<string, any>'.
+src/app/dashboard/page.tsx(61,6): error TS2741: Property 'activityLogs' is missing in type '{ user: SessionUser; stats: { todayOrders: number; pendingOrders: number; lowStockProducts: number; totalRevenue: number; }; }' but required in type 'DashboardClientProps'.
+src/lib/activity-logger.ts(31,9): error TS2322: Type 'Record<string, any> | null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
