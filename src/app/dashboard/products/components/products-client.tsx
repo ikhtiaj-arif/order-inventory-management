@@ -26,7 +26,8 @@ interface Product {
   sku: string;
   stock: number;
   price: number;
-  isActive: boolean;
+  status: "ACTIVE" | "INACTIVE" | "OUT_OF_STOCK";
+  category: { name: string } | null;
   createdAt: string;
 }
 
@@ -155,16 +156,22 @@ export default function ProductsClient() {
                                   {product.stock}
                                 </span>
                               </TableCell>
-                              <TableCell>${product.price.toFixed(2)}</TableCell>
+                              <TableCell>${Number(product.price).toFixed(2)}</TableCell>
                               <TableCell>
                                 <span
-                                  className={`text-sm ${
-                                    product.isActive
-                                      ? "text-green-600"
-                                      : "text-gray-500"
+                                  className={`text-sm px-2 py-1 rounded font-medium ${
+                                    product.status === "ACTIVE"
+                                      ? "bg-green-100 text-green-800"
+                                      : product.status === "OUT_OF_STOCK"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-gray-100 text-gray-500"
                                   }`}
                                 >
-                                  {product.isActive ? "Active" : "Inactive"}
+                                  {product.status === "ACTIVE"
+                                    ? "Active"
+                                    : product.status === "OUT_OF_STOCK"
+                                    ? "Out of Stock"
+                                    : "Inactive"}
                                 </span>
                               </TableCell>
                               <TableCell className="text-sm text-muted-foreground">

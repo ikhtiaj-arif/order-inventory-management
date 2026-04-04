@@ -86,6 +86,8 @@ model Category {
 model Product {
   id                String        @id @default(cuid())
   name              String
+  sku               String        @unique
+  description       String?
   categoryId        String
   price             Decimal       @db.Decimal(10, 2)
   stock             Int           @default(0)
@@ -105,6 +107,7 @@ model Product {
   @@index([userId, status])
   @@index([categoryId])
   @@index([userId, name])
+  @@index([sku])
 }
 
 model Order {

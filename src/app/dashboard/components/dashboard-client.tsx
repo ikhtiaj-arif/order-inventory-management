@@ -191,7 +191,9 @@ export default function DashboardClient({
                             {log.action.replace(/_/g, " ")}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {log.details}
+                            {typeof log.details === "object" && log.details !== null
+                              ? (log.details as any).message ?? JSON.stringify(log.details)
+                              : String(log.details ?? "—")}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
                             {new Date(log.createdAt).toLocaleString()}

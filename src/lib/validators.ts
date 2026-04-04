@@ -30,17 +30,15 @@ export const CategorySchema = z.object({
 // Product Schemas
 export const ProductSchema = z.object({
   name: z.string().min(1, "Product name is required").max(255),
+  sku: z.string().min(1, "SKU is required").max(100),
+  description: z.string().max(1000).optional().nullable(),
   categoryId: z.string().min(1, "Category is required"),
-  price: z
-    .string()
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Price must be a positive number",
-    }),
-  stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
-  minStockThreshold: z.coerce
-    .number()
-    .int()
-    .min(1, "Min stock threshold must be at least 1"),
+  price: z.preprocess((arg) => (typeof arg === "string" ? Number(arg) : arg), z.number().positive("Price must be a positive number")),
+  stock: z.preprocess((arg) => (typeof arg === "string" ? Number(arg) : arg), z.number().int().min(0, "Stock cannot be negative")),
+  minStockThreshold: z.preprocess(
+    (arg) => (typeof arg === "string" ? Number(arg) : arg),
+    z.number().int().min(1, "Min stock threshold must be at least 1")
+  ),
   status: z.enum(["ACTIVE", "INACTIVE"]).default("ACTIVE"),
 });
 

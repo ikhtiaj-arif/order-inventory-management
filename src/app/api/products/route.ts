@@ -55,7 +55,14 @@ export async function POST(req: NextRequest) {
 
     const product = await prisma.product.create({
       data: {
-        ...validatedData,
+        name: validatedData.name,
+        sku: validatedData.sku,
+        description: validatedData.description,
+        categoryId: validatedData.categoryId,
+        price: validatedData.price,
+        stock: validatedData.stock,
+        minStockThreshold: validatedData.minStockThreshold,
+        status: validatedData.status,
         userId: session.user.id as string,
       },
       include: { category: true },

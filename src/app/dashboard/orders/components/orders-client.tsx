@@ -29,8 +29,9 @@ import OrderForm from "./order-form";
 interface Order {
   id: string;
   orderNumber: string;
+  customerName: string;
   status: string;
-  totalAmount: number;
+  totalPrice: number;
   createdAt: string;
   items: any[];
 }
@@ -164,7 +165,7 @@ export default function OrdersClient() {
                                 </span>
                               </TableCell>
                               <TableCell className="font-medium">
-                                ${order.totalAmount.toFixed(2)}
+                                ${Number(order.totalPrice).toFixed(2)}
                               </TableCell>
                               <TableCell className="text-sm text-muted-foreground">
                                 {new Date(order.createdAt).toLocaleDateString()}

@@ -1,49 +1,70 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { logout } from "@/app/actions/auth";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { AlertCircle } from "lucide-react";
 import { useState } from "react";
+import useSWR from "swr";
 
-// interface ActivityLog {
-//   id: string;
-//   action: string;
-//   entityType: string;
-//   entityId: string;
-//   details: string;
-//   createdAt: string;
-//   user: { name: string; email: string };
-// }
+interface ActivityLog {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  details: any;
+  createdAt: string;
+  user: { name: string | null; email: string };
+}
 
-// interface ActivityClientProps {
-//   initialLogs: ActivityLog[];
-// }
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// export default function ActivityClient({ initialLogs }: ActivityClientProps) {
+const getActionColor = (action: string) => {
+  if (action.includes("CREATE")) return "bg-green-100 text-green-800";
+  if (action.includes("UPDATE")) return "bg-blue-100 text-blue-800";
+  if (action.includes("DELETE")) return "bg-red-100 text-red-800";
+  if (action.includes("APPROVE")) return "bg-purple-100 text-purple-800";
+  return "bg-gray-100 text-gray-800";
+};
+
 export default function ActivityClient() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { data, isLoading, error } = useSWR("/api/activity", fetcher, {
+    revalidateOnFocus: false,
+  });
 
   const handleLogout = async () => {
     await logout();
   };
 
-  // const filteredLogs = initialLogs.filter((log: { action: string; details: string; user: { name: string; }; }) =>
-  //   log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   log.user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const logs: ActivityLog[] = data?.logs || [];
 
-  const getActionColor = (action: string) => {
-    if (action.includes("CREATE")) return "bg-green-100 text-green-800";
-    if (action.includes("UPDATE")) return "bg-blue-100 text-blue-800";
-    if (action.includes("DELETE")) return "bg-red-100 text-red-800";
-    if (action.includes("APPROVE")) return "bg-purple-100 text-purple-800";
-    return "bg-gray-100 text-gray-800";
-  };
+  const filteredLogs = logs.filter((log) => {
+    const term = searchTerm.toLowerCase();
+    const details =
+      typeof log.details === "object" && log.details !== null
+        ? JSON.stringify(log.details)
+        : String(log.details ?? "");
+    return (
+      log.action.toLowerCase().includes(term) ||
+      details.toLowerCase().includes(term) ||
+      (log.user.name ?? "").toLowerCase().includes(term)
+    );
+  });
 
   return (
     <div className="flex h-screen bg-background">
@@ -77,7 +98,18 @@ export default function ActivityClient() {
                   />
                 </div>
 
-                {/* {filteredLogs.length === 0 ? (
+                {error && (
+                  <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-md mb-4">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                    <p className="text-red-800 text-sm">Failed to load activity logs.</p>
+                  </div>
+                )}
+
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">Loading activity logs...</p>
+                  </div>
+                ) : filteredLogs.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground">No activities found</p>
                   </div>
@@ -94,25 +126,25 @@ export default function ActivityClient() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredLogs.map((log: { id: Key | null | undefined; action: string; entityType: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; details: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; user: { name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; email: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }; createdAt: string | number | Date; }) => (
+                        {filteredLogs.map((log) => (
                           <TableRow key={log.id}>
                             <TableCell>
-                              <Badge className={getActionColor(log.action)}>
+                              <span
+                                className={`px-2 py-1 rounded text-xs font-medium ${getActionColor(log.action)}`}
+                              >
                                 {log.action.replace(/_/g, " ")}
-                              </Badge>
+                              </span>
                             </TableCell>
-                            <TableCell className="text-sm">
-                              {log.entityType}
-                            </TableCell>
-                            <TableCell className="text-sm max-w-xs">
-                              {log.details}
+                            <TableCell className="text-sm">{log.entityType}</TableCell>
+                            <TableCell className="text-sm max-w-xs truncate">
+                              {typeof log.details === "object" && log.details !== null
+                                ? (log.details as any).message ?? JSON.stringify(log.details)
+                                : String(log.details ?? "—")}
                             </TableCell>
                             <TableCell className="text-sm">
                               <div>
-                                <p className="font-medium">{log.user.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {log.user.email}
-                                </p>
+                                <p className="font-medium">{log.user.name ?? "Unknown"}</p>
+                                <p className="text-xs text-muted-foreground">{log.user.email}</p>
                               </div>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
@@ -123,7 +155,7 @@ export default function ActivityClient() {
                       </TableBody>
                     </Table>
                   </div>
-                )} */}
+                )}
               </CardContent>
             </Card>
           </div>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EntityType, Prisma } from '@/generated/prisma'
+import { EntityType, Prisma } from '@prisma/client'
 import { prisma } from './db'
 
 
