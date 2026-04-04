@@ -31,9 +31,9 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <main className="min-h-screen bg-transparent">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0">
+      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Smart Inventory Manager</h1>
           <Link href="/login">
@@ -148,7 +148,7 @@ export default async function HomePage() {
         </div>
 
         {/* Tech Stack */}
-        <div className="bg-white rounded-lg border p-12 mb-20">
+        <div className="bg-card rounded-lg border p-12 mb-20 shadow-sm">
           <h3 className="text-2xl font-bold mb-8 text-center">
             Built with Modern Technology
           </h3>
@@ -195,7 +195,7 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-white mt-20">
+      <footer className="border-t bg-background mt-20">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center text-muted-foreground">
           <p>Smart Inventory Manager v1.0</p>
           <p className="text-sm mt-2">

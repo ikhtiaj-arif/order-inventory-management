@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "./theme-toggle";
 
 interface HeaderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,7 +35,6 @@ export default function Header({ user, onLogout, onMenuClick }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2">
