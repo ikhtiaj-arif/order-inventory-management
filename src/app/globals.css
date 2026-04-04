@@ -123,6 +123,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, oklch(0.18 0.02 245) 0%, oklch(0.10 0.02 250) 100%);
+    background-attachment: fixed;
   }
   html {
     @apply font-sans;
