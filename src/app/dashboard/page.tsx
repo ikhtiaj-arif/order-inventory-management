@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   }
 
   // Fetch dashboard data
-  const [todayOrders, pendingOrders, lowStockProducts, totalRevenue, activityLogs] =
+  const [todayOrders, pendingOrders, lowStockProducts, totalRevenue, activityLogs, productSummary] =
     await Promise.all([
       prisma.order.count({
         where: {
@@ -55,6 +55,12 @@ export default async function DashboardPage() {
         orderBy: { createdAt: "desc" },
         include: { user: true },
       }),
+      prisma.product.findMany({
+        where: { userId: session.user.id },
+        take: 5,
+        orderBy: { stock: "asc" },
+        select: { name: true, stock: true, minStockThreshold: true }
+      }),
     ]);
 
   return (
@@ -67,6 +73,7 @@ export default async function DashboardPage() {
         totalRevenue: Number(totalRevenue._sum.totalPrice || 0),
       }}
       activityLogs={activityLogs}
+      productSummary={productSummary}
     />
   );
 }

@@ -25,6 +25,7 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import { logout } from "@/app/actions/auth";
 import OrderForm from "./order-form";
+import { toast } from "sonner";
 
 interface Order {
   id: string;
@@ -56,6 +57,25 @@ export default function OrdersClient() {
 
   const orders = data?.orders || [];
   const pagination = data?.pagination || {};
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        mutate();
+        toast.success("Order status updated successfully!");
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.error || "Failed to update order status");
+      }
+    } catch (e) {
+      toast.error("An error occurred while updating the order status");
+    }
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -114,7 +134,7 @@ export default function OrdersClient() {
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Status</SelectItem>
+                      {/* <SelectItem value="">All Status</SelectItem> */}
                       <SelectItem value="PENDING">Pending</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
                       <SelectItem value="CANCELLED">Cancelled</SelectItem>
@@ -142,6 +162,7 @@ export default function OrdersClient() {
                             <TableHead>Status</TableHead>
                             <TableHead>Total</TableHead>
                             <TableHead>Created</TableHead>
+                            <TableHead>Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -156,7 +177,11 @@ export default function OrdersClient() {
                                   className={`px-2 py-1 rounded text-sm font-medium ${
                                     order.status === "PENDING"
                                       ? "bg-yellow-100 text-yellow-800"
-                                      : order.status === "COMPLETED"
+                                      : order.status === "CONFIRMED"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : order.status === "SHIPPED"
+                                      ? "bg-purple-100 text-purple-800"
+                                      : order.status === "DELIVERED"
                                       ? "bg-green-100 text-green-800"
                                       : "bg-gray-100 text-gray-800"
                                   }`}
@@ -169,6 +194,24 @@ export default function OrdersClient() {
                               </TableCell>
                               <TableCell className="text-sm text-muted-foreground">
                                 {new Date(order.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={order.status}
+                                  onValueChange={(val) => handleStatusChange(order.id, val)}
+                                  disabled={order.status === "CANCELLED" || order.status === "DELIVERED"}
+                                >
+                                  <SelectTrigger className="w-[130px] h-8 text-xs">
+                                    <SelectValue placeholder="Update Status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="PENDING">Pending</SelectItem>
+                                    <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                                    <SelectItem value="SHIPPED">Shipped</SelectItem>
+                                    <SelectItem value="DELIVERED">Delivered</SelectItem>
+                                    <SelectItem value="CANCELLED" className="text-red-600 focus:text-red-600 focus:bg-red-50">Cancel Order</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </TableCell>
                             </TableRow>
                           ))}

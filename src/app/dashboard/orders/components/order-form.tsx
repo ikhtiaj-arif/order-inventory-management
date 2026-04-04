@@ -63,6 +63,12 @@ export default function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   });
 
   const onSubmit = async (data: OrderFormData) => {
+    const productIds = data.items.map((i) => i.productId);
+    if (new Set(productIds).size !== productIds.length) {
+      setSubmitError("Duplicate products are not allowed in the same order.");
+      return;
+    }
+
     setSubmitError("");
     setIsSubmitting(true);
 

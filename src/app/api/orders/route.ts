@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/sessions";
+import { logActivity } from "@/lib/activity-logger";
 import { NextRequest, NextResponse } from "next/server";
-
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
@@ -54,33 +54,97 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 });
     }
 
-    // Basic calculation for totalPrice
+    const productIds = items.map((item: any) => item.productId);
+    const uniqueProductIds = new Set(productIds);
+    if (uniqueProductIds.size !== productIds.length) {
+      return NextResponse.json({ error: "This product is already added to the order." }, { status: 400 });
+    }
+
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, userId: session.user.id },
+    });
+
+    const productsMap = new Map(products.map(p => [p.id, p]));
+
     let totalPrice = 0;
-    const orderItems = items.map((item: any) => {
-      const subtotal = item.quantity * item.unitPrice;
+    const orderItemsToCreate: any[] = [];
+
+    for (const item of items) {
+      const product = productsMap.get(item.productId);
+      if (!product) {
+        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 400 });
+      }
+      if (product.status === "INACTIVE") {
+        return NextResponse.json({ error: `This product is currently unavailable: ${product.name}` }, { status: 400 });
+      }
+      if (item.quantity > product.stock) {
+        return NextResponse.json({ error: `Only ${product.stock} items available in stock for ${product.name}` }, { status: 400 });
+      }
+
+      const subtotal = item.quantity * Number(product.price);
       totalPrice += subtotal;
-      return {
+
+      orderItemsToCreate.push({
         productId: item.productId,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
+        unitPrice: product.price,
         subtotal: subtotal,
-      };
-    });
+      });
+    }
 
-    const order = await prisma.order.create({
-      data: {
-        orderNumber: `ORD-${Date.now()}`,
-        customerName,
-        totalPrice,
-        userId: session.user.id as string,
-        items: {
-          create: orderItems,
+    const result = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          orderNumber: `ORD-${Date.now()}`,
+          customerName,
+          totalPrice,
+          userId: session.user.id as string,
+          items: {
+            create: orderItemsToCreate,
+          },
         },
-      },
-      include: { items: true },
+        include: { items: true },
+      });
+
+      for (const item of items) {
+        const product = productsMap.get(item.productId)!;
+        const newStock = product.stock - item.quantity;
+        let newStatus = product.status;
+        
+        if (newStock <= 0) {
+          newStatus = "OUT_OF_STOCK";
+        }
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: newStock, status: newStatus }
+        });
+
+        if (newStock <= product.minStockThreshold) {
+          await tx.restockQueue.upsert({
+            where: { productId: product.id },
+            update: { currentStock: newStock },
+            create: {
+              productId: product.id,
+              currentStock: newStock,
+              priority: newStock <= 0 ? "HIGH" : "MEDIUM",
+              userId: session.user.id as string,
+            }
+          });
+        }
+      }
+      return order;
     });
 
-    return NextResponse.json(order, { status: 201 });
+    await logActivity({
+      userId: session.user.id as string,
+      action: "CREATE_ORDER",
+      entityType: "ORDER",
+      entityId: result.id,
+      details: { message: `Created order: ${result.orderNumber} for ${customerName}` },
+    });
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error("Orders POST error:", error);
     return NextResponse.json(

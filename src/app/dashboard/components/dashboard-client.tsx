@@ -33,6 +33,7 @@ interface DashboardClientProps {
     totalRevenue: number;
   };
   activityLogs: any[];
+  productSummary: any[];
 }
 
 // Mock chart data
@@ -50,6 +51,7 @@ export default function DashboardClient({
   user,
   stats,
   activityLogs,
+  productSummary,
 }: DashboardClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
@@ -204,6 +206,32 @@ export default function DashboardClient({
                       <p className="text-xs text-muted-foreground">
                         No recent activity
                       </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Product Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Product Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 max-h-80 overflow-y-auto">
+                    {productSummary && productSummary.length > 0 ? (
+                      productSummary.map((p, i) => {
+                        const isLowStock = p.stock <= p.minStockThreshold;
+                        return (
+                          <div key={i} className="flex justify-between items-center text-sm border-b pb-3 last:border-0">
+                            <span className="font-medium text-foreground">{p.name}</span>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${isLowStock ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}>
+                              {p.stock} left ({isLowStock ? "Low Stock" : "OK"})
+                            </span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-xs text-muted-foreground">No products found</p>
                     )}
                   </div>
                 </CardContent>

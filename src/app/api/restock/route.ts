@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
         skip,
         take: limit,
         include: { product: true },
-        orderBy: { priority: "desc" },
+        orderBy: { currentStock: "asc" },
       }),
       prisma.restockQueue.count({
         where: { userId: session.user.id },

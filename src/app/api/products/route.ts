@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logActivity } from "@/lib/activity-logger";
 
 import { prisma } from "@/lib/db";
